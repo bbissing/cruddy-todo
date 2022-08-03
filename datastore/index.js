@@ -3,23 +3,77 @@ const path = require('path');
 const _ = require('underscore');
 const counter = require('./counter');
 
-var items = {};
+
 
 // Public API - Fix these CRUD functions ///////////////////////////////////////
 
 exports.create = (text, callback) => {
-  var id = counter.getNextUniqueId(() => {});
-  console.log(text, id);
-  items[id] = text;
-  callback(null, { id, text });
+  counter.getNextUniqueId(function(err, id) {
+    if (err) {
+
+      callback(err);
+
+    } else {
+
+
+      var test = id + '.txt';
+      var filepath = path.join(exports.dataDir, test);
+      fs.writeFile(filepath, text, (err) => {
+        if (err) {
+          callback(err);
+        } else {
+          callback(null, {id, text});
+        }
+      });
+
+    }
+  });
 };
+//console.log(filepath);
+//callback(null, { id, text });
+
+// fs.readdir(__dirname, (err, files) => {
+//   if (err)
+//     console.log(err);
+//   else {
+//     console.log("\nCurrent directory filenames:");
+//     files.forEach(file => {
+//       console.log(file);
+//     })
+//   }
+// })
+
 
 exports.readAll = (callback) => {
-  var data = _.map(items, (text, id) => {
-    return { id, text };
+  fs.readdir(exports.dataDir, (err, files) => {
+    var answer = [];
+
+    if (err) {
+      callback(err);
+    } else {
+      if (files.length === 0) {
+        callback(null, files);
+      } else {
+        files.forEach(file => {
+          var arr = file.split('.');
+          answer.push({'id': arr[0], 'text': arr[0]});
+        });
+        callback(null, answer);
+      }
+    }
   });
-  callback(null, data);
 };
+
+
+
+
+// fs.readFile(exports.dataDir + '/' + file, (err, fileData) => {
+//   if (err) {
+//     callback(err);
+//   } else {
+//     answer.push({:fileData.toString());
+//   }
+// });
 
 exports.readOne = (id, callback) => {
   var text = items[id];
