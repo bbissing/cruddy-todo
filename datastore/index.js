@@ -83,16 +83,38 @@ exports.readOne = (id, callback) => {
       callback(null, {'id': id, 'text': fileData.toString() });
     }
   });
+
 };
 
 exports.update = (id, text, callback) => {
-  var item = items[id];
-  if (!item) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    items[id] = text;
-    callback(null, { id, text });
-  }
+  // var item = items[id];
+  // if (!item) {
+  //   callback(new Error(`No item with id: ${id}`));
+  // } else {
+  //   items[id] = text;
+  //   callback(null, { id, text });
+  // }
+  // console.log(exports.readOne);
+  // var testing = exports.readOne(id, (err, data) => { console.log(data); });
+  // console.log(testing);
+  // if (testing) {
+
+  fs.readFile(exports.dataDir + '/' + id + '.txt', (err, fileData) => {
+    if (err) {
+      callback(err);
+    } else {
+
+      var test = id + '.txt';
+      var filepath = path.join(exports.dataDir, test);
+      fs.writeFile(filepath, text, (err) => {
+        if (err) {
+          callback(err);
+        } else {
+          callback(null, {id, text});
+        }
+      });
+    }
+  });
 };
 
 exports.delete = (id, callback) => {
