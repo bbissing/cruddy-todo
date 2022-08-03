@@ -63,25 +63,26 @@ exports.readAll = (callback) => {
     }
   });
 };
-
-
-
-
 // fs.readFile(exports.dataDir + '/' + file, (err, fileData) => {
 //   if (err) {
 //     callback(err);
 //   } else {
-//     answer.push({:fileData.toString());
+
 //   }
 // });
 
+
+
+
 exports.readOne = (id, callback) => {
-  var text = items[id];
-  if (!text) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback(null, { id, text });
-  }
+  // console.log(id);
+  fs.readFile(exports.dataDir + '/' + id + '.txt', (err, fileData) => {
+    if (err) {
+      callback(err);
+    } else {
+      callback(null, {'id': id, 'text': fileData.toString() });
+    }
+  });
 };
 
 exports.update = (id, text, callback) => {
