@@ -37,11 +37,6 @@ const writeCounter = (count, callback) => {
 };
 
 // Public API - Fix this function //////////////////////////////////////////////
-// if (exports.counterFile === undefined) {
-//   var counter = 0;
-// } else {
-//   var counter = readCounter(function(err, fileData) { return fileData; });
-// }
 
 exports.getNextUniqueId = (callBack) => {
   readCounter(function(err, fileData) {
@@ -60,8 +55,6 @@ exports.getNextUniqueId = (callBack) => {
   });
   return zeroPaddedNumber(counter);
 };
-//function(err, fileData) { return fileData; }
-// function(err, counterString) { return counterString; }
 
 // Configuration -- DO NOT MODIFY //////////////////////////////////////////////
 
