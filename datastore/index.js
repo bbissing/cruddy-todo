@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const _ = require('underscore');
 const counter = require('./counter');
+var Promise = require('bluebird');
 
 // Public API - Fix these CRUD functions ///////////////////////////////////////
 
@@ -24,22 +25,34 @@ exports.create = (text, callback) => {
 };
 
 exports.readAll = (callback) => {
+  var promises = [];
   fs.readdir(exports.dataDir, (err, files) => {
-    var answer = [];
 
     if (err) {
       callback(err);
     } else {
       if (files.length === 0) {
-        callback(null, files);
+        callback(null, []);
+        return;
       } else {
         files.forEach(file => {
-          var arr = file.split('.');
-          answer.push({'id': arr[0], 'text': arr[0]});
+          var promise = new Promise ((resolve, reject) => {
+            fs.readFile(exports.dataDir + '/' + file, (err, fileData) => {
+              if (err) {
+                reject(err);
+              } else {
+                var arr = file.split('.');
+                resolve({'id': arr[0], 'text': fileData.toString()});
+              }
+            });
+          });
+          promises.push(promise);
         });
-        callback(null, answer);
       }
     }
+    return Promise.all(promises)
+      .then((data) => { callback(null, data); })
+      .catch((err) => { console.error(err); });
   });
 };
 
@@ -75,16 +88,7 @@ exports.update = (id, text, callback) => {
 };
 
 exports.delete = (id, callback) => {
-  // var item = items[id];
-  // delete items[id];
-  // if (!item) {
-  //   // report an error if item not found
-  //   callback(new Error(`No item with id: ${id}`));
-  // } else {
-  //   callback();
-  // }
   fs.readFile(exports.dataDir + '/' + id + '.txt', (err, fileData) => {
-
     if (err) {
       callback(err);
     } else {
@@ -99,9 +103,6 @@ exports.delete = (id, callback) => {
     }
   });
 };
-
-
-
 
 // Config+Initialization code -- DO NOT MODIFY /////////////////////////////////
 
